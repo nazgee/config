@@ -1,0 +1,14 @@
+alias ack='ack --smart-case'
+alias ackp='ack --passthru'
+
+alias ackpg='ackp --color-match="black on_green"'
+alias ackpy='ackp --color-match="black on_yellow"'
+alias ackpr='ackp --color-match="black on_red"'
+alias ackpb='ackp --color-match="white on_blue"'
+alias ackpm='ackp --color-match="black on_magenta"'
+
+alias ackg='ack --color-match="black on_green"'
+alias acky='ack --color-match="black on_yellow"'
+alias ackr='ack --color-match="black on_red"'
+alias ackb='ack --color-match="white on_blue"'
+alias ackm='ack --color-match="black on_magenta"'
