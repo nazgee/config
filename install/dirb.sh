@@ -2,9 +2,10 @@
 
 # include some helper functions
 
-DIR="${BASH_SOURCE%/*}"
-if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
-. "$DIR/../script/sourceme/pretty.sh"
+_SCRIPTDIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$_SCRIPTDIR" ]]; then _SCRIPTDIR="$PWD"; fi
+_SCRIPTDIR=`realpath $_SCRIPTDIR`
+. "$_SCRIPTDIR/../script/sourceme/pretty.sh"
 
 
 # check if all params provided
@@ -39,5 +40,5 @@ printf "Installing ${cGREEN}dirb${cNC} in $_SRCDIR; $_CONFIG_FILE used as config
 
 cd $_INSTALLDIR
 git clone https://github.com/icyfork/dirb
-echo "source $_SRCDIR/dirb.sh" >> $_CONFIG_FILE
+$_SCRIPTDIR/configline.sh "source $_SRCDIR/dirb.sh" $_CONFIG_FILE
 
