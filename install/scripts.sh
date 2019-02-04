@@ -34,4 +34,6 @@ _BINDIR=`realpath $_SCRIPTDIR/../script`
 
 $_SCRIPTDIR/configline.sh "export PATH=\$PATH:$_BINDIR" $_CONFIG_FILE
 $_SCRIPTDIR/configline.sh "export PATH=\$PATH:$_BINDIR/android" $_CONFIG_FILE
+$_SCRIPTDIR/configline.sh "export PATH=\$PATH:$_BINDIR/util" $_CONFIG_FILE
+$_SCRIPTDIR/configline.sh "export PATH=\$PATH:$_BINDIR/corporate" $_CONFIG_FILE
 
