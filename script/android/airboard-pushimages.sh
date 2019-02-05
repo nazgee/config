@@ -1,8 +1,10 @@
 #!/bin/bash
 
-fastboot flash system_b system.img
-fastboot flash userdata userdata.img
-fastboot flash vendor_a vendor.img
-fastboot flash vendor_b vendor.img
-fastboot flash persist persist.img
+_out=$1
+
+fastboot flash system_b $_out/system.img
+fastboot flash userdata $_out/userdata.img
+fastboot flash vendor_a $_out/vendor.img
+fastboot flash vendor_b $_out/tvendor.img
+fastboot flash persist $_out/persist.img
 fastboot -w
