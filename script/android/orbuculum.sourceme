@@ -1,0 +1,12 @@
+pervert.sh ./frameworks/native/libs/gui
+pervert.sh ./frameworks/native/libs/ui
+pervert.sh ./hardware/qcom/display/
+make clean-surfaceflinger clean-libsurfaceflinger clean-hwcomposer.msmnile clean-libsdmutils clean-libqservice clean-libqservice clean-libsdmcore
+
+orbuculum.sh --out ./compile_commands.json libgui libui surfaceflinger libsurfaceflinger hwcomposer.msmnile libsdmutils libqservice libqservice libsdmcore
+
+sed -f orbuculum.sed -i ./compile_commands.json
+
+#sed -i \
+#'/"-mthumb",/d; /"arm-linux-androideabi",/d; /"aarch64-linux-android",/d; /"-fcolor-diagnostics",/d; /"-target",/d; /"-mfpu=neon",/d; /"-mcpu=kryo",/d; /"-mfloat-abi=softfp",/d; /"-nostdlibinc",/d; /"-mllvm",/d; /"-arm-assume-misaligned-load-store=true",/d; /"-fno-sanitize-coverage=edge,indirect-calls,8bit-counters,trace-cmp",/d; /"-fsanitize=integer",/d; /"-no-integrated-as",/d; /"-mthumb-interwork",/d; /"-march=armv7-a",/d; /"-Weverything",/d; /"-fsanitize=unsigned-integer-overflow",/d; /"-mdefault-to-arm",/d; /"-march=armv8-a",/d; /"-fsanitize=unsigned-integer-overflow,signed-integer-overflow",/d; /"-fno-sanitize-recover=integer",/d;' \
+#./compile_commands.json
