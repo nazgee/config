@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AIRBOARD=192.168.1.1
+AIRBOARD=192.168.1.115
 OVERLAY=$1
 
 ftp-upload --passive -h $AIRBOARD -u root -d /scripts $OVERLAY/scripts/startup.sh
