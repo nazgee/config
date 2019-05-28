@@ -7,6 +7,7 @@ sudo apt-get install ack
 sudo apt install python3-dev python3-pip python3-setuptools
 sudo pip3 install thefuck
 sudo apt install cmake
+sudo apt install vim python
 
 # misc
 sudo apt-get install qemu-kvm cpu-checker
