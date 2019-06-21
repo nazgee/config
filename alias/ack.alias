@@ -1,5 +1,5 @@
 alias ack='ack --smart-case'
-alias ackp='ack --passthru'
+alias ackp='ack --passthru --color'
 
 alias ackpg='ackp --color-match="black on_green"'
 alias ackpy='ackp --color-match="black on_yellow"'
