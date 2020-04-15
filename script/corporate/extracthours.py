@@ -22,4 +22,4 @@ for line in fileinput.input():
 		print m.groups()[0] + ",\t" + str(timeexp) + ",\t" + str(round(timeact,1)) + ",\t" + str(round(timeovr,1))
 
 timeovrsum = timeactsum - timeexpsum
-print "\t,\t" +  str(round(timeexpsum,1)) + ",\t" + str(round(timeactsum,1)) + ",\t" + str(round(timeovrsum,1))
+print ",\t" +  str(round(timeexpsum,1)) + ",\t" + str(round(timeactsum,1)) + ",\t" + str(round(timeovrsum,1))
