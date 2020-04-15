@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # root device and remount filesystem
-adb root && sleep 2s && adb remount && sleep 1s
+#adb root && sleep 2s && adb remount && sleep 1s
 
 # add some colors
 WHITE='\033[1;37m'
@@ -15,10 +15,10 @@ SUCCEDED=0
 STATICLIB=0
 FAILLIST=()
 while read line; do
-    if [[ $(echo $line | grep '^Install:') != '' ]]
+    if [[ $(echo $line | grep 'Install:') != '' ]]
     then
-        path=`echo $line | awk '{print $2}'`
-        pathremote=`echo $path | sed s:out/target/product/[^/]*::`
+        path=`echo "$line" | sed 's/.*Install: //'`
+        pathremote=`echo $path | sed 's:out/target/product/[^/]*::'`
 
         printf "${GREEN}Install:${NC} ${WHITE}${ANDROID_BUILD_TOP}/${path}${NC} to ${WHITE}$(dirname $pathremote)${NC}\n"
         adb push "$ANDROID_BUILD_TOP/$path" $pathremote
@@ -34,9 +34,9 @@ while read line; do
     then
         staticlib=`echo $line | awk '{print $3}'`
         STATICLIB=$((STATICLIB+1))
-        printf "$line\n${PURPLE}Static:${NC} ${WHITE}$staticlib.a${NC}\n";
+        printf "$line\n${PURPLE}Static:${NC} ${WHITE}$staticlib.a${NC}\n"
     else
-        printf "$line\n";
+        echo "$line"
     fi
 done
 
