@@ -26,7 +26,8 @@ while read line; do
         if [ $? -ne 0 ]
         then
             FAILED=$((FAILED+1))
-            FAILLIST=(${FAILLIST[@]} $pathremote)
+            FAILLIST+=($pathremote\n)
+	    printf "${RED}Failed to install $pathremote ${NC}\n"
         else
             SUCCEDED=$((SUCCEDED+1))
         fi
