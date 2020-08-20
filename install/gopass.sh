@@ -37,13 +37,30 @@ Usage:
 
 export GOPATH=$_INSTALLDIR
 
+# prepare functions to fail
+exit_on_error() {
+   exit_code=$1
+   last_command=${@:2}
+   if [ $exit_code -ne 0 ]; then
+      >&2 echo "\"${last_command}\" command failed with exit code ${exit_code}."
+      exit $exit_code
+   fi
+}
+# enable !! command completion
+set -o history -o histexpand
+
+# check if git can access the key
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+git clone git@github.com:nazgee/keystore.git $tmp_dir
+exit_on_error $? !!
+
 # install
 
 printf "Installing ${cGREEN}$_TARGET${cNC} in $_INSTALLDIR; $_CONFIG_FILE used as config file\n"
 
 
 sudo apt-get install golang-go gnupg git rng-tools xclip
-go get github.com/gopasspw/gopass
+GO111MODULE=on go get github.com/gopasspw/gopass
 $_SCRIPTDIR/configline.sh "PATH=\$PATH:$_INSTALLDIR/bin" $_CONFIG_FILE
 . $_CONFIG_FILE
 gopass --yes setup --remote git@github.com:nazgee/keystore.git --alias nazgee --name "Michal Stawinski" --email "michal.stawinski@gmail.com"
