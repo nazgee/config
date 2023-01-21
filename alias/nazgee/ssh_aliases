@@ -1,0 +1,22 @@
+
+function nazgee-adb-forward() {
+	local SRV="$1"
+	local VDIIP="`ifconfig | grep -A 1 tap0 | tail -n1 | awk "-F " '{print $2 }'`"
+	
+	if [ -z "$VDIIP" ]; then
+		echo "NoMachine port sharing not enabled." > /dev/stderr
+		echo "" > /dev/stderr
+		echo "Press ctrl+alt+0 and go to \"Devices-> Connect a network port -> Local ports -> Add a network port\"." > /dev/stderr
+		echo "Share TCP 5038:5038 if you want your local adb shared with VDI." > /dev/stderr
+		echo "When done, invoke ${FUNCNAME[0]} to forward adb :5038 from your local system to server with adb :5038" > /dev/stderr
+		return 1
+	fi
+
+	ADB_PORT_DST=5038
+	ADB_PORT_SRC=5039
+
+	echo "Create a SSH tunnel to $SRV for $IP2:$ADB_PORT_SRC -> localhost:$ADB_PORT_DST"
+	ssh "$SRV" -p 443 -L $VDIIP:$ADB_PORT_SRC:localhost:$ADB_PORT_DST -N -o "ExitOnForwardFailure yes"
+}
+
+

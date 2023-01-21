@@ -1,0 +1,210 @@
+#!/bin/bash
+
+# edit these 2
+username=""
+password=""
+
+
+dirname="${username}"
+proto="http://"
+server="10.140.3.215:30238"
+repo="repository/dev-flash-packages"
+serverrepo="${server}/${repo}"
+binname=`basename $0`
+
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+NORMAL="\033[0m"
+
+UP=0
+DOWN=0
+FILE=""
+EXTRACT=0
+DIR=0
+KEEPPATH=0
+
+function upload {
+	local filename=`basename "$1"`
+	nfo "uploading \"${filename}\" to \"${proto}${serverrepo}/${dirname}/${filename}\" ..."
+	# use PIPASTATUs to check curl status, not grep
+	if curl --fail --user "${username}:${password}" -T $1 ${proto}${serverrepo}/${dirname}/${filename} -# | tee -a /dev/null ; test ${PIPESTATUS[0]} -eq 0; then
+		nfo "upload ok"
+	else
+		err "upload failed"
+	fi
+}
+
+function download_curl() {
+	local filename=`basename "$1"`
+	if [ ${KEEPPATH} -eq 1 ]; then
+		filename="$1"
+	fi
+	if curl --fail --user "${username}:${password}" -o $1 ${proto}${serverrepo}/${dirname}/$filename; then
+		nfo "download ok"
+	else
+		err "download failed"
+	fi
+}
+
+function download_axel() {
+	local filename=`basename "$1"`
+	if [ ${KEEPPATH} -eq 1 ]; then
+		filename="$1"
+	fi
+	# use PIPASTATUs to check axel status, not grep or awk
+	# hide password using grep. grep makes ncurses output multiline, so use awk to squeze it into one line
+	if axel "${proto}${username}:${password}@${serverrepo}/${dirname}/${filename}" | grep -v --line-buffered "Initializing download" | awk '{printf "\r%s                                                           ",$0}'; test ${PIPESTATUS[0]} -eq 0;
+	then
+		echo ""
+		nfo "download ok"
+	else
+		echo ""
+		wrn "\"axel\" failed, trying \"curl\"..."
+		download_curl "$1"
+	fi
+}
+
+function download {
+	local filename=`basename "$1"`
+	if [ ${KEEPPATH} -eq 1 ]; then
+		filename="$1"
+	fi
+	nfo "downloading \"${proto}${serverrepo}/${dirname}/${filename}\" to \"$1\" ..."
+	if [ -f $1 ]; then
+		wrn "$1 already exists, removing it before re-downloading..."
+		rm $1
+	fi
+
+	if command -v axel > /dev/null
+	then
+		if [ $DIR -ne 1 ]; then
+			msg "using \"axel\", fast mode"
+			download_axel "$1"
+		else
+			# FIXME: it seems, that axel fails when --dir is used
+			# never tried to fix it properly, so workaround it
+			msg "using \"curl\", normal mode (\"axel\" does not work for non-owned dirs)"
+			download_curl "$1"
+		fi
+	else
+		msg "using \"curl\", normal mode (install \"axel\" to enable fast mode: \"sudo apt install axel\""
+		download_curl "$1"
+	fi
+}
+
+function extract() {
+	if file $FILE | grep "gzip compressed data" > /dev/null ; then
+		local DIRNAME="${FILE%%.*}"
+		mkdir "$DIRNAME" -p
+		if command -v pigz > /dev/null; then
+			nfo "unpacking \"$FILE\" (multithreaded, using pigz) ..."
+			if tar -C ${DIRNAME} -I pigz -xf ${FILE}; then
+				nfo "unpacking ok"
+			else
+				err "unpacking failed"
+			fi
+
+		else
+			wrn "unpacking \"$FILE\" (install \"pigz\" to enable multithreaded: \"sudo apt install pigz\") ..."
+			if tar -C ${DIRNAME} -xzf ${FILE}; then
+				nfo "unpacking ok"
+			else
+				err "unpacking failed"
+			fi
+		fi
+	else
+		err "\"$FILE\" is not a gzip archive or does not exist, extraction skipped"
+	fi
+}
+
+function msg() {
+	printf ">>> ${1}\n"
+}
+
+function nfo() {
+	printf ">>> ${GREEN}${1}${NORMAL}\n"
+}
+
+function wrn() {
+	printf ">>> ${YELLOW}${1}${NORMAL}\n"
+}
+
+function err() {
+	printf ">>> ${RED}${1}${NORMAL}\n"
+}
+
+function help() {
+	echo "Usage:"
+	echo ""
+	echo "to download a file from nexus:"
+	echo "   ${binname} [--dir DIR] --up PATH_TO_FILE "
+	echo "to upload a file to nexus:"
+	echo "   ${binname} [--dir DIR] [--extract] --down FILE"
+	echo ""
+	echo "OPTIONS:"
+	echo "  --up PATH_TO_FILE         upload FILE from PATH_TO_FILE to ${serverrepo}/${dirname}/FILE"
+	echo "                            (using curl)"
+	echo "  --down FILE               download ${serverrepo}/${dirname}/FILE to current directory"
+	echo "                            (using axel if available, curl if axel not isntalled)"
+	echo "  --extract                 extract downloaded .tar.gz FILE after download"
+	echo "                            (using pigz, multithreaded)"
+	echo "  --dir DIR                 change nexus DIR from default \"${serverrepo}/${dirname}\" to \"${server}/${repo}/DIR\""
+	echo "  --keeppath                keep filename as-is (normally, basename would be extracted, e.g. foo/bar.sh would become bar.sh)"
+}
+
+while [[ $# -gt 0 ]]; do
+	case $1 in
+		--up)
+			UP=1
+			FILE="$2"
+			shift
+			shift
+			;;
+		--down)
+			DOWN=1
+			FILE="$2"
+			shift
+			shift
+			;;
+		--extract)
+			EXTRACT=1
+			shift
+			;;
+		--keeppath)
+			KEEPPATH=1
+			shift
+			;;
+		--dir)
+			dirname="$2"
+			DIR=1
+			shift
+			shift
+			;;
+		--help)
+			help
+			exit 0
+			;;
+		*)
+			err "Unknown option \"${1}\""
+			help
+			exit 1
+	esac
+done
+
+if [[ -z ${UP} && -z ${DOWN} ]]; then
+	err "--up and --down are mutually exclusive"
+	help
+	exit 1
+fi
+
+if [ ${UP} -eq 1 ]; then
+	upload "$FILE"
+fi
+
+if [ ${DOWN} -eq 1 ]; then
+	download "$FILE"
+	if [ ${EXTRACT} -eq 1 ]; then
+		extract "$FILE"
+	fi
+fi

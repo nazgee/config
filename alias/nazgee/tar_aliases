@@ -1,0 +1,33 @@
+nazgee-tarc() 
+{ 
+	if command -v pigz > /dev/null 2>&1; then
+		tar -I pigz -cf "$(basename $1).tar.gz" "$1"
+	else
+		tar -czf "$(basename $1).tar.gz" "$1"
+	fi
+}
+
+nazgee-tarx() {
+	if command -v pigz > /dev/null 2>&1; then
+		tar -I pigz -xf "$1"
+	else
+		tar -xzf "$1"
+	fi
+}
+
+nazgee-tarcu() {
+	if [ -z $1 ]; then
+		echo "no build given"
+		return 1
+	else
+		if [ -z $2 ]; then
+			echo "no archive name given"
+		else
+			local mypwd=`pwd`
+			local target=`realpath --relative-to="${mypwd}" "${1}"`
+			nazgee-tarc "${target}"
+			mv "${target}.tar.gz" "${2}.tar.gz"
+			nexus.sh --up "${2}.tar.gz"
+		fi
+	fi
+}

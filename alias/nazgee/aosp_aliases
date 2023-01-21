@@ -1,0 +1,96 @@
+function nazgee-msg() {
+    local GREEN='\033[0;32m'
+    local NC='\033[0m' # No Color
+    printf "${GREEN}${1}${NC}\n"
+}
+
+function nazgee-aosp-dir-ls-mods() {
+    local ORIGPATH="`pwd`"
+    croot
+    local MODSPATHREL=`realpath --relative-to="$ANDROID_BUILD_TOP" "$ORIGPATH"`
+    dirmods "$MODSPATHREL" | tr '\n' ' '
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-dir-ls-cleanmods() {
+    local ORIGPATH="`pwd`"
+    croot
+    local MODSPATHREL=`realpath --relative-to="$ANDROID_BUILD_TOP" "$ORIGPATH"`
+    dirmods "$MODSPATHREL" | sed 's/^/clean-/' | tr '\n' ' '
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-dir-clean() {
+    local ORIGPATH="`pwd`"
+    local CLEANMODS=`nazgee-aosp-dir-ls-cleanmods`
+    nazgee-msg "cleaning ${CLEANMODS}"
+    croot && make ${CLEANMODS}
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-dir-rebuild() {
+    local ORIGPATH="`pwd`"
+    local CLEANMODS=`nazgee-aosp-dir-ls-cleanmods`
+    local BUILDMODS=`nazgee-aosp-dir-ls-mods`
+    nazgee-msg "cleaning ${CLEANMODS}"
+    nazgee-msg "building ${BUILDMODS}"
+    croot && make ${CLEANMODS} && make ${BUILDMODS}
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-annotatemk() {
+    local APPEND='$(warning "nazgee-annotation")'
+    local FILE="$1"
+
+    sed "/^else/a $APPEND" "$FILE" -i
+    sed "/^if/a $APPEND" "$FILE" -i
+}
+
+function nazgee-aosp-package-out() {
+    cd "$OUT"
+    local TARGZNAME="`cat build_fingerprint.txt | awk -F "/" '{print $2 }'`-`date +'%d-%m-%y-%H:%M'`"
+    if [ -n "$1" ]; then
+        TARGZNAME="`cat build_fingerprint.txt | awk -F "/" '{print $2 }'`-$1"
+    fi
+    local TEMP=`mktemp -d -t $TARGZNAME-XXX`
+    echo "`pwd`/$TARGZNAME.tar.gz"
+
+    # ignore folder and archives, copy rest to temporary dir
+    ls --file-type | grep -v ".*/" | grep -v "\.tar\.gz" | xargs -I{} cp {} "$TEMP"
+    # compress
+    tar -c --use-compress-program=pigz -f "$TARGZNAME.tar.gz" "$TEMP"
+    # cleanup
+    rm "$TEMP" -rf
+    cd -
+}
+
+function nazgee-aosp-package-out-upload() {
+    cd "$OUT"
+    local TARGZNAME="`cat build_fingerprint.txt | awk -F "/" '{print $2 }'`-`date +'%d-%m-%y-%H:%M'`"
+    if [ -n "$1" ]; then 
+        TARGZNAME="`cat build_fingerprint.txt | awk -F "/" '{print $2 }'`-$1"
+    fi
+    local TEMP=`mktemp -d -t $TARGZNAME-XXX`
+    echo "`pwd`/$TARGZNAME.tar.gz"
+
+    # ignore folder and archives, copy rest to temporary dir
+    ls --file-type | grep -v ".*/" | grep -v "\.tar\.gz" | xargs -I{} cp {} "$TEMP"
+    # compress
+    tar -c --use-compress-program=pigz -f "$TARGZNAME.tar.gz" "$TEMP"
+    # cleanup
+    rm "$TEMP" -rf
+    
+    nexus.sh --up "$TARGZNAME.tar.gz"
+    cd -
+}
+
+function nazgee-aosp-gki-kernel-clean() {
+   if [[ -z "${ANDROID_BUILD_TOP}" ]]; then
+      echo "missing android build env"
+   else
+      cd "${ANDROID_BUILD_TOP}"
+      echo "deleting GKI artifacts"
+      rm kernel_platform/out/ -rf
+      rm ./device/qcom/msmnile-kernel/ -rf
+   fi
+}
