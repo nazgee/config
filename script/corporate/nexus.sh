@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # edit these 2
-username=""
-password=""
+username=`cat ~/.nexus_user`
+password=`cat ~/.nexus_pass`
 
 
 dirname="${username}"
