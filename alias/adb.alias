@@ -1,0 +1,23 @@
+# helper to get a PID of a process by name
+# $1: name (or part of name) of a process
+function nazgee-apid() {
+	adb shell ps | grep -i "$1" | awk "-F " '{print $2 }'
+}
+
+# helper for showing logcat only of a single process
+# $1: name (or part of name) of a process
+function nazgee-aplog() {
+	local PID=$(nazgee-apid "$1")
+	adb logcat | grep -i " $PID "
+}
+
+# shortcut for root & remount
+function nazgee-arr() {
+	adb root && adb remount
+}
+
+# shortcut for root, remount, sync & reboot
+function nazgee-arrsr() {
+	nazgee-arr && adb sync && adb shell sync && adb reboot
+}
+

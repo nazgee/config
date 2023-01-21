@@ -1,5 +1,5 @@
 
-function nazgee-adb-forward() {
+function pasa-adb-forward() {
 	local SRV="$1"
 	local VDIIP="`ifconfig | grep -A 1 tap0 | tail -n1 | awk "-F " '{print $2 }'`"
 	

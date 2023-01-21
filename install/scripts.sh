@@ -20,7 +20,7 @@ _USAGE="
 Usage:
    $ `basename $0` [CONFIG_FILE]
 
-   Adds 'script' director to CONFIG_FILE (default: ~/.bash_aliases)
+   Adds 'script' directory to CONFIG_FILE (default: ~/.bash_aliases)
 "
 
 # check args valid

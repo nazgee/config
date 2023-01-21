@@ -1,0 +1,48 @@
+function nazgee-msg() {
+    local GREEN='\033[0;32m'
+    local NC='\033[0m' # No Color
+    printf "${GREEN}${1}${NC}\n"
+}
+
+function nazgee-aosp-dir-ls-mods() {
+    local ORIGPATH="`pwd`"
+    croot
+    local MODSPATHREL=`realpath --relative-to="$ANDROID_BUILD_TOP" "$ORIGPATH"`
+    dirmods "$MODSPATHREL" | tr '\n' ' '
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-dir-ls-cleanmods() {
+    local ORIGPATH="`pwd`"
+    croot
+    local MODSPATHREL=`realpath --relative-to="$ANDROID_BUILD_TOP" "$ORIGPATH"`
+    dirmods "$MODSPATHREL" | sed 's/^/clean-/' | tr '\n' ' '
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-dir-clean() {
+    local ORIGPATH="`pwd`"
+    local CLEANMODS=`nazgee-aosp-dir-ls-cleanmods`
+    nazgee-msg "cleaning ${CLEANMODS}"
+    croot && make ${CLEANMODS}
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-dir-rebuild() {
+    local ORIGPATH="`pwd`"
+    local CLEANMODS=`nazgee-aosp-dir-ls-cleanmods`
+    local BUILDMODS=`nazgee-aosp-dir-ls-mods`
+    nazgee-msg "cleaning ${CLEANMODS}"
+    nazgee-msg "building ${BUILDMODS}"
+    croot && make ${CLEANMODS} && make ${BUILDMODS}
+    cd "$ORIGPATH"
+}
+
+function nazgee-aosp-annotatemk() {
+    local APPEND='$(warning "nazgee-annotation")'
+    local FILE="$1"
+
+    sed "/^else/a $APPEND" "$FILE" -i
+    sed "/^if/a $APPEND" "$FILE" -i
+}
+

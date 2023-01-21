@@ -22,13 +22,13 @@ Usage:
 
    Installs ALIAS_FILE in CONFIG_FILE (default: ~/.bash_aliases)
    Available ALIAS_FILEs:
-   `ls $_ALIASPATH`
+`find $_ALIASPATH -name '*.alias'`
 "
 [[ $# -gt 0 ]] || printffail "$_USAGE"
 
 # check args valid
 
-_ALIAS=`realpath $_ALIASPATH/$1`
+_ALIAS=`realpath $1`
 [[ -f $_ALIAS ]] || printffail "Alias '$_ALIASPATH' does not exist\n"
 [[ -f $_CONFIG_FILE ]] || printffail "Config file '$_CONFIG_FILE' does ${cRED}not${cNC} exist\n"
 
