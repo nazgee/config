@@ -8,24 +8,18 @@ _SCRIPTDIR=`realpath $_SCRIPTDIR`
 . "$_SCRIPTDIR/../script/sourceme/pretty.sh"
 
 
-# check if all params provided
-_INSTALLDIR=`realpath ~/go`
-if [ ! -z $1 ]; then
-        _INSTALLDIR=`realpath $1`
-fi
-
 _CONFIG_FILE=~/.bash_aliases
-if [ ! -z $2 ]; then
-        _CONFIG_FILE=$2
+if [ ! -z $1 ]; then
+        _CONFIG_FILE=$1
 fi
 
 _TARGET="gopass"
 
 _USAGE="
 Usage:
-   $ `basename $0` [INSTALL_DIR] [CONFIG_FILE]
+   $ `basename $0` [CONFIG_FILE]
 
-   Installs gopass in INSTALL_DIR/bin (default: ~/go) and appends config line to CONFIG_FILE (default: ~/.bash_aliases)
+   Installs gopass and appends config line to CONFIG_FILE (default: ~/.bash_aliases)
 "
 #[[ $# -gt 3 ]] || printffail "$_USAGE"
 
@@ -60,8 +54,8 @@ printf "Installing ${cGREEN}$_TARGET${cNC} in $_INSTALLDIR; $_CONFIG_FILE used a
 
 
 sudo apt-get install golang-go gnupg git rng-tools xclip
-GO111MODULE=on go get github.com/gopasspw/gopass
-$_SCRIPTDIR/configline.sh "PATH=\$PATH:$_INSTALLDIR/bin" $_CONFIG_FILE
+go install github.com/gopasspw/gopass@latest
+$_SCRIPTDIR/configline.sh "PATH=\$PATH:~/go/bin" $_CONFIG_FILE
 . $_CONFIG_FILE
 gopass --yes setup --remote git@github.com:nazgee/keystore.git --alias nazgee --name "Michal Stawinski" --email "michal.stawinski@gmail.com"
 
