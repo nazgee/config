@@ -8,6 +8,6 @@ echo
 if [[ $REPLY =~ ^[Yy]$ || $REPLY = '' ]]
 then
 	echo "Replacing..."
-	find $1 -type f | xargs sed -i  "s/$2/$3/g"
+	find $1 -type f | xargs sed -i  "s|$2|$3|g"
 fi
 echo "Bye!"
