@@ -1,2 +1,3 @@
-sudo systemctl start zsaservice
-/opt/zscaler/bin/ZSTray
+sudo -A systemctl start zsaservice
+sleep 1
+/opt/zscaler/bin/ZSTray &

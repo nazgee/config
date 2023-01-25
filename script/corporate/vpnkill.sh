@@ -1,4 +1,5 @@
-sudo systemctl stop zsaservice
-sudo systemctl stop zstunnel
-sudo killall ZSTray
+sudo -A killall ZSTray
+sudo -A systemctl stop zsaservice
+sudo -A systemctl stop zstunnel
+sudo -A killall ZSTray
 ps aux | ack zs
