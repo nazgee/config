@@ -1,5 +1,7 @@
-sudo -A killall ZSTray
-sudo -A systemctl stop zsaservice
-sudo -A systemctl stop zstunnel
-sudo -A killall ZSTray
+#!/bin/bash
+
+#SUDO_ASKPASS=/usr/bin/ssh-askpass
+killall ZSTray
+systemctl stop zsaservice zstunnel
+killall ZSTray
 ps aux | ack zs
