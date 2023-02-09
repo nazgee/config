@@ -17,16 +17,19 @@ nazgee-tarx() {
 
 nazgee-tarcu() {
 	if [ -z $1 ]; then
-		echo "no build given"
+		echo "no DIR given"
 		return 1
 	else
+		local mypwd=`pwd`
+		local target=`realpath --relative-to="${mypwd}" "${1}"`
+		nazgee-tarc "${target}"
+
 		if [ -z $2 ]; then
-			echo "no archive name given"
+			echo "uploading: ${target}.tar.gz"
+			nexus.sh --up "${target}.tar.gz"
 		else
-			local mypwd=`pwd`
-			local target=`realpath --relative-to="${mypwd}" "${1}"`
-			nazgee-tarc "${target}"
-			mv "${target}.tar.gz" "${2}.tar.gz"
+			echo "renaming archive, uploading:${2}.tar.gz"
+			mv `basename "${target}.tar.gz"` "${2}.tar.gz"
 			nexus.sh --up "${2}.tar.gz"
 		fi
 	fi

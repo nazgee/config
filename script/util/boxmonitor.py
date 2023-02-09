@@ -40,16 +40,19 @@ completed: subprocess.CompletedProcess = None
 def on_success(msg):
     print(msg + "\n" + elapsedTimer.elapsed_str())
     subprocess.run(["openrgb", "-p", "ok"], stdout=subprocess.DEVNULL)
+    exit(0)
 
 
 def on_failure(msg):
     print(msg + "\n" + elapsedTimer.elapsed_str())
     subprocess.run(["openrgb", "-p", "error"], stdout=subprocess.DEVNULL)
+    exit(1)
 
 
 def on_idle(msg):
     print(msg + "\n" + elapsedTimer.elapsed_str())
     subprocess.run(["openrgb", "-p", "idle"], stdout=subprocess.DEVNULL)
+    exit(0)
 
 
 def handler(signum, frame):
