@@ -35,23 +35,26 @@ class Timer:
 
 elapsedTimer: Timer = None
 completed: subprocess.CompletedProcess = None
-
+orgbip: str = ""
 
 def on_success(msg):
     print(msg + "\n" + elapsedTimer.elapsed_str())
-    subprocess.run(["openrgb", "-p", "ok"], stdout=subprocess.DEVNULL)
+    subprocess.run(["openrgb", "-p", "ok", "--client", orgbip], stdout=subprocess.DEVNULL)
     exit(0)
 
 
 def on_failure(msg):
     print(msg + "\n" + elapsedTimer.elapsed_str())
-    subprocess.run(["openrgb", "-p", "error"], stdout=subprocess.DEVNULL)
+    subprocess.run(["openrgb", "-p", "error", "--client", orgbip], stdout=subprocess.DEVNULL)
     exit(1)
 
 
 def on_idle(msg):
-    print(msg + "\n" + elapsedTimer.elapsed_str())
-    subprocess.run(["openrgb", "-p", "idle"], stdout=subprocess.DEVNULL)
+    if elapsedTimer:
+        print(msg + "\n" + elapsedTimer.elapsed_str())
+    else:
+        print(msg)
+    subprocess.run(["openrgb", "-p", "idle", "--client", orgbip], stdout=subprocess.DEVNULL)
     exit(0)
 
 
@@ -66,7 +69,7 @@ def run_subprocess(args):
 
     signal.signal(signal.SIGINT, handler)
     try:
-        subprocess.run(["openrgb", "-p", "busy"], stdout=subprocess.DEVNULL)
+        subprocess.run(["openrgb", "-p", "busy", "--client", orgbip], stdout=subprocess.DEVNULL)
         elapsedTimer = Timer()
         completed = subprocess.run(args)
         if completed.returncode < 0:
@@ -82,11 +85,13 @@ def run_subprocess(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--orgbip", default="127.0.0.1", help="IP address of OpenRGB server (default: %(default)s)")
     parser.add_argument("command", nargs=argparse.REMAINDER, help="Command to run and its arguments")
     args = parser.parse_args()
+    orgbip = args.orgbip
 
     if not args.command:
-        on_idle(0, "startup")
+        on_idle("idle")
         parser.error("Command is required")
 
     run_subprocess(args.command)
