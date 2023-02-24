@@ -25,8 +25,8 @@ nazgee-tarcu() {
 		nazgee-tarc "${target}"
 
 		if [ -z $2 ]; then
-			echo "uploading: ${target}.tar.gz"
-			nexus.sh --up "${target}.tar.gz"
+			echo "uploading: `basename ${target}.tar.gz`"
+			nexus.sh --up "`basename ${target}.tar.gz`"
 		else
 			echo "renaming archive, uploading:${2}.tar.gz"
 			mv `basename "${target}.tar.gz"` "${2}.tar.gz"
