@@ -11,6 +11,8 @@ parser.add_argument("--username", default=getpass.getuser(), help="username to u
 parser.add_argument("--server", default="aerepo.cloud.panasonicautomotive.com", help="gerrit server to use (default: %(default)s)")
 parser.add_argument("--port", type=int, default=29418, help="gerrit port server to use (default: %(default)s)")
 parser.add_argument("--cherry-pick", action="store_true",  default=False, help="cherry-pick instead of checkout")
+parser.add_argument("--status", default="open", type=str, required=False, help="gerrit change status to apply changes (default: %(default)s)")
+parser.add_argument("--dry-run", action="store_true",  default=False, help="do nothing, just print the commands (default: %(default)s)")
 
 search_type_group = parser.add_mutually_exclusive_group(required=True)
 search_type_group.add_argument("--topic", type=str, required=False, help="gerrit topic to apply changes from")
@@ -31,7 +33,7 @@ client.connect(
     username=args.username
 )
 
-ssh_cmdline = "gerrit query --format=JSON --current-patch-set status:open"
+ssh_cmdline = "gerrit query --format=JSON --current-patch-set status:" + args.status
 if args.topic:
     ssh_cmdline = ssh_cmdline + " topic:" + args.topic
 else:
@@ -55,6 +57,11 @@ class Change:
 
     def download(self):
         cmd = f"{self.base_repo_cmd} {self.project} {self.id}"
+
+        if args.dry_run:
+            print("dry-run: " + cmd)
+            return True
+
         result = subprocess.run(cmd, shell=True, stderr=subprocess.PIPE)
         if result.returncode == 0:
             return True
@@ -64,6 +71,11 @@ class Change:
 
     def cherrypick(self):
         cmd = f"{self.base_repo_cmd} --cherry-pick {self.project} {self.id}"
+
+        if args.dry_run:
+            print("dry-run: " + cmd)
+            return True
+
         result = subprocess.run(cmd, shell=True, stderr=subprocess.PIPE)
         if result.returncode == 0:
             return True

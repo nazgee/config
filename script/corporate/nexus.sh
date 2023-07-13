@@ -8,6 +8,7 @@ password=`cat ~/.nexus_pass`
 dirname="${username}"
 proto="http://"
 server="10.140.3.215:30238"
+#server="100.64.1.11:30501"
 repo="repository/dev-flash-packages"
 serverrepo="${server}/${repo}"
 binname=`basename $0`

@@ -4,6 +4,11 @@ function nazgee-apid() {
 	adb shell ps | grep -i "$1" | awk "-F " '{print $2 }'
 }
 
+# return a name of a process from it's PID
+function nazgee-aname() {
+	adb shell ps | awk -v pid="$1" '$2 == pid {print $NF}'
+}
+
 # helper for showing logcat only of a single process
 # $1: name (or part of name) of a process
 function nazgee-aplog() {

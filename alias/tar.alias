@@ -8,11 +8,22 @@ nazgee-tarc()
 }
 
 nazgee-tarx() {
-	if command -v pigz > /dev/null 2>&1; then
-		tar -I pigz -xf "$1"
-	else
-		tar -xzf "$1"
-	fi
+    if [[ "$1" == *.gz ]]; then
+        if command -v pigz > /dev/null 2>&1; then
+            tar -I pigz -xf "$1";
+        else
+            tar -xzf "$1";
+        fi
+    elif [[ "$1" == *.xz ]]; then
+        if command -v pxz > /dev/null 2>&1; then
+            tar -I 'pxz -d' -xf "$1";
+        else
+            tar -xJf "$1";
+        fi
+    else
+        echo "Unknown file type: $1"
+        return 1
+    fi
 }
 
 nazgee-tarcu() {

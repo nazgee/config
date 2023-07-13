@@ -18,4 +18,18 @@ usage() {
 
 WORKSPACE=`realpath "${2}"`
 
-docker run -u $(id -u ${USER}):$(id -g ${USER}) -v ~/.profile:/.profile -v ~/.bashrc:/.bashrc -v ~/.bash_aliases:/.bash_aliases -v ~/.config/OpenRGB:/.config/OpenRGB -v ~/work/extensions/config:/home/michal/work/extensions/config -v "${WORKSPACE}:${WORKSPACE}" -v ~/.gitconfig:/etc/gitconfig -v ~/qnx710:/qnx710 -v ~/flexserver:/flexserver -v ~/.qnx:/root/.qnx -v ~/.flexlmrc:/root/.flexlmrc -w "${WORKSPACE}" --add-host=host.docker.internal:host-gateway -i -t "${1}"
+	#-u $(id -u ${USER}):$(id -g ${USER}) \
+docker run \
+	--cpus 31 \
+	-m 48g \
+	-u michal \
+	-v ~/.profile:/home/michal/.profile -v ~/.bashrc:/home/michal/.bashrc -v ~/.bash_aliases:/home/michal/.bash_aliases -v ~/.config/OpenRGB:/home/michal/.config/OpenRGB \
+	-v /mnt/work/extensions/config:/mnt/work/extensions/config \
+	-v "${WORKSPACE}:${WORKSPACE}" -v ~/.gitconfig:/home/michal/gitconfig \
+	-v ~/qnx710:/home/michal/qnx710 -v ~/flexserver:/home/michal/flexserver -v ~/.qnx:/home/michal/.qnx -v ~/.flexlmrc:/home/michal/.flexlmrc \
+	-v ~/.cache:/home/michal/.cache \
+	-v ~/.citnames:/home/michal/.citnames \
+	-v ~/.shellb/:/home/michal/.shellb \
+	-v ~/.shellbrc/:/home/michal/.shellbrc \
+	-v /mnt/work/extensions/shellb:/mnt/work/extensions/shellb \
+	-w "${WORKSPACE}" --add-host=host.docker.internal:host-gateway -i -t "${1}"
