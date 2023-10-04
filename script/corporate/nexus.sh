@@ -79,15 +79,8 @@ function download {
 
 	if command -v axel > /dev/null
 	then
-		if [ $DIR -ne 1 ]; then
-			msg "using \"axel\", fast mode"
-			download_axel "$1"
-		else
-			# FIXME: it seems, that axel fails when --dir is used
-			# never tried to fix it properly, so workaround it
-			msg "using \"curl\", normal mode (\"axel\" does not work for non-owned dirs)"
-			download_curl "$1"
-		fi
+		msg "using \"axel\", fast mode"
+		download_axel "$1"
 	else
 		msg "using \"curl\", normal mode (install \"axel\" to enable fast mode: \"sudo apt install axel\""
 		download_curl "$1"
