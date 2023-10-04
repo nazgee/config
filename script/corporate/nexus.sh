@@ -88,29 +88,34 @@ function download {
 	fi
 }
 
-function extract() {
-	if file $FILE | grep "gzip compressed data" > /dev/null ; then
-		local DIRNAME="${FILE%%.*}"
-		mkdir "$DIRNAME" -p
-		if command -v pigz > /dev/null; then
-			nfo "unpacking \"$FILE\" (multithreaded, using pigz) ..."
-			if tar -C ${DIRNAME} -I pigz -xf ${FILE}; then
-				nfo "unpacking ok"
-			else
-				err "unpacking failed"
-			fi
+smart-extract() {
+    if [[ "$1" == *.gz ]]; then
+        if command -v pigz > /dev/null 2>&1; then
+            tar -I pigz -xf "$1";
+        else
+            tar -xzf "$1";
+        fi;
+    else
+        if [[ "$1" == *.xz ]]; then
+            if command -v pxz > /dev/null 2>&1; then
+                tar -I 'pxz -d' -xf "$1";
+            else
+                tar -xJf "$1";
+            fi;
+        else
+            err "Unknown file type: $1";
+        fi;
+    fi
+}
 
-		else
-			wrn "unpacking \"$FILE\" (install \"pigz\" to enable multithreaded: \"sudo apt install pigz\") ..."
-			if tar -C ${DIRNAME} -xzf ${FILE}; then
-				nfo "unpacking ok"
-			else
-				err "unpacking failed"
-			fi
-		fi
-	else
-		err "\"$FILE\" is not a gzip archive or does not exist, extraction skipped"
-	fi
+
+function extract() {
+	local DIRNAME="${FILE%%.*}"
+	mkdir "$DIRNAME" -p
+	nfo "unpacking \"$FILE\"..."
+	mv "${FILE}" "${DIRNAME}/"
+	cd "$DIRNAME"
+	smart-extract "${FILE}"
 }
 
 function msg() {
