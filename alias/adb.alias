@@ -4,6 +4,10 @@ function nazgee-apid() {
 	adb shell ps | grep -i "$1" | awk "-F " '{print $2 }'
 }
 
+function nazgee-akill() {
+	adb shell kill `nazgee-apid "$1"`
+}
+
 # return a name of a process from it's PID
 function nazgee-aname() {
 	adb shell ps | awk -v pid="$1" '$2 == pid {print $NF}'
