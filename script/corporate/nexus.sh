@@ -53,6 +53,7 @@ function download_axel() {
 	if [ ${KEEPPATH} -eq 1 ]; then
 		filename="$1"
 	fi
+	#echo "cmd: axel ${proto}${username}:${password}@${serverrepo}/${dirname}/${filename}"
 	# use PIPASTATUs to check axel status, not grep or awk
 	# hide password using grep. grep makes ncurses output multiline, so use awk to squeze it into one line
 	if axel "${proto}${username}:${password}@${serverrepo}/${dirname}/${filename}" | grep -v --line-buffered "Initializing download" | awk '{printf "\r%s                                                           ",$0}'; test ${PIPESTATUS[0]} -eq 0;
@@ -139,6 +140,7 @@ function help() {
 	echo "OPTIONS:"
 	echo "  --up PATH_TO_FILE         upload FILE from PATH_TO_FILE to ${serverrepo}/${dirname}/FILE"
 	echo "                            (using curl)"
+	echo "  --prv  BUILDNUM           download ${serverrepo}/CI/HQX-CI-sg3/<BUILDNUM>/jenkins-HQX-CI-sg3-<BUILDNUM>.tar.xz"
 	echo "  --down FILE               download ${serverrepo}/${dirname}/FILE to current directory"
 	echo "                            (using axel if available, curl if axel not isntalled)"
 	echo "  --extract                 extract downloaded .tar.gz FILE after download"
@@ -152,6 +154,15 @@ while [[ $# -gt 0 ]]; do
 		--up)
 			UP=1
 			FILE="$2"
+			shift
+			shift
+			;;
+		--prv)
+			buildnum="$2"
+			DOWN=1
+			FILE="jenkins-HQX-CI-sg3-${buildnum}.tar.xz"
+			DIR=1
+			dirname="CI/HQX-CI-sg3/${buildnum}"
 			shift
 			shift
 			;;
