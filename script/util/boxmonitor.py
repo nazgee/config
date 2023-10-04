@@ -36,6 +36,7 @@ class Timer:
 # openrgb -d "Logitech G915 Wireless RGB Mechanical Gaming Keyboard" -c 0000ff
 
 colorMap = {"idle": "0000ff", "busy": "55280a", "error": "ff0000", "ok": "00ff00", "off": "000000"}
+#colorMap = {"idle": "0000ff", "busy": "20004", "error": "ff0000", "ok": "00ff00", "off": "000000"}
 orgbBlink="openrgb -d \"Logitech G915 Wireless RGB Mechanical Gaming Keyboard\" -c "
 
 elapsedTimer: Timer = None
