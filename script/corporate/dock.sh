@@ -19,14 +19,22 @@ usage() {
 WORKSPACE=`realpath "${2}"`
 
 	#-u $(id -u ${USER}):$(id -g ${USER}) \
+	#
+# -v /etc/localtime:/etc/localtime:ro
+
 docker run \
 	--cpus 31 \
-	-m 48g \
+	-m 60g \
 	-u michal \
+	--hostname box \
 	-v ~/.profile:/home/michal/.profile -v ~/.bashrc:/home/michal/.bashrc -v ~/.bash_aliases:/home/michal/.bash_aliases -v ~/.config/OpenRGB:/home/michal/.config/OpenRGB \
 	-v /mnt/work/extensions/config:/mnt/work/extensions/config \
+	-v /home/michal/.nexus_pass:/home/michal/.nexus_pass \
+	-v /home/michal/.nexus_user:/home/michal/.nexus_user \
 	-v "${WORKSPACE}:${WORKSPACE}" -v ~/.gitconfig:/home/michal/gitconfig \
 	-v ~/qnx710:/home/michal/qnx710 -v ~/flexserver:/home/michal/flexserver -v ~/.qnx:/home/michal/.qnx -v ~/.flexlmrc:/home/michal/.flexlmrc \
+	-v /home/michal/Qualcomm:/home/michal/Qualcomm \
+	-v /pkg:/pkg \
 	-v ~/.cache:/home/michal/.cache \
 	-v ~/.citnames:/home/michal/.citnames \
 	-v ~/.shellb/:/home/michal/.shellb \
